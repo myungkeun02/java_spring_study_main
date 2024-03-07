@@ -1,0 +1,14 @@
+version: "3"
+services:
+  music_db:
+    image: mysql:8.0
+    container_name: music_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      TZ: Asia/Seoul
+    ports:
+      - 3309:3306
+    volumes:
+      - ./mysql-init-files/:/docker-entrypoint-initdb.d
+    platform: linux/x86_64
