@@ -8,9 +8,9 @@ public interface ProductService {
 
     ProductsResponseDto getAllProducts(int pageNo, int pageSize, String sortBy, String sortDir);
 
-    ProductDto getProductById(String id);
+    ProductDto getProductById(long id);
 
-    ProductDto updateProductById(String id, ProductDto productDto);
+    ProductDto updateProductById(long id, ProductDto productDto);
 
-    String deleteProductById(String id);
+    String deleteProductById(long id);
 }
