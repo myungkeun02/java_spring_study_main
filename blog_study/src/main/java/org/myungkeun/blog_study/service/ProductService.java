@@ -6,7 +6,7 @@ import org.myungkeun.blog_study.payload.ProductsResponseDto;
 public interface ProductService {
     ProductDto createProduct(ProductDto productDto);
 
-    ProductsResponseDto getAllProducts();
+    ProductsResponseDto getAllProducts(int pageNo, int pageSize, String sortBy, String sortDir);
 
     ProductDto getProductById(String id);
 

@@ -1,16 +1,14 @@
 version: "3"
 services:
-  mysql_db:
+  employee_db:
     image: mysql:8.0
-    container_name: mysql_db
+    container_name: employee_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: password
       TZ: Asia/Seoul
     ports:
-      - 3308:3306
+      - 3309:3306
     volumes:
       - ./mysql-init-files/:/docker-entrypoint-initdb.d
     platform: linux/x86_64
-    networks:
-      - blog_network

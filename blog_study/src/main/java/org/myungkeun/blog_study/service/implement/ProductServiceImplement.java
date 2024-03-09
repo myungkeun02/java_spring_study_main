@@ -7,7 +7,12 @@ import org.myungkeun.blog_study.payload.ProductDto;
 import org.myungkeun.blog_study.payload.ProductsResponseDto;
 import org.myungkeun.blog_study.repository.ProductRepository;
 import org.myungkeun.blog_study.service.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,13 +36,26 @@ public class ProductServiceImplement implements ProductService {
         return productResponse;
     }
 
+
+
+
     @Override
-    public ProductsResponseDto getAllProducts() {
-        List<ProductEntity> products = productRepository.findAll();
-        List<ProductDto> contents = products.stream().map(productEntity ->
+    public ProductsResponseDto getAllProducts(int pageNo, int pageSize, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<ProductEntity> products = productRepository.findAll(pageable);
+        List<ProductEntity> listOfProducts = products.getContent();
+        List<ProductDto> contents = listOfProducts.stream().map(productEntity ->
                 mapToDto(productEntity)).collect(Collectors.toList());
         ProductsResponseDto productsResponse = new ProductsResponseDto();
         productsResponse.setContent(contents);
+        productsResponse.setPageNo(products.getNumber() - 1);
+        productsResponse.setPageSize(products.getSize());
+        productsResponse.setTotalPages(products.getTotalPages());
+        productsResponse.setTotalElements(products.getTotalElements());
+        productsResponse.setLast(products.isLast());
         return productsResponse;
     }
 
