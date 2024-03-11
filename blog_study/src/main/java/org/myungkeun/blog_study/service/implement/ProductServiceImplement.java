@@ -53,7 +53,10 @@ public class ProductServiceImplement implements ProductService {
 
     @Override
     public ProductsResponseDto getAllProducts(int pageNo, int pageSize, String sortBy, String sortDir) {
+
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+
 
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
 

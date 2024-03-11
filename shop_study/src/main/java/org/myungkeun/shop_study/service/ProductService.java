@@ -6,11 +6,10 @@ import org.myungkeun.shop_study.payload.ProductsResponseDto;
 public interface ProductService {
     ProductDto createProduct(ProductDto productDto);
 
-    ProductsResponseDto getAllProducts();
+    ProductsResponseDto getAllProducts(int pageNo, int pageSize, String sortBy, String sortDir);
+    ProductDto getProductById(int id);
 
-    ProductDto getProductById(String id);
+    ProductDto updateProductById(int id, ProductDto productDto);
 
-    ProductDto updateProductById(String id, ProductDto productDto);
-
-    String deleteProductById(String id);
+    String deleteProductById(int id);
 }

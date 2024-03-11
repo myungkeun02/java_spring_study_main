@@ -12,5 +12,3 @@ services:
     volumes:
       - ./mysql-init-files/:/docker-entrypoint-initdb.d
     platform: linux/x86_64
-    networks:
-      - blog_network

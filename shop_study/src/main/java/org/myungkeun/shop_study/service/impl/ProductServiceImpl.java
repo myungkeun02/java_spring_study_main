@@ -7,6 +7,10 @@ import org.myungkeun.shop_study.payload.ProductDto;
 import org.myungkeun.shop_study.payload.ProductsResponseDto;
 import org.myungkeun.shop_study.repository.ProductRepository;
 import org.myungkeun.shop_study.service.ProductService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,23 +35,33 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductsResponseDto getAllProducts() {
-        List<ProductEntity> products = productRepository.findAll();
-        List<ProductDto> contents = products.stream().map(productEntity ->
+    public ProductsResponseDto getAllProducts(int pageNo, int pageSize, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Page<ProductEntity> products = productRepository.findAll(pageable);
+        List<ProductEntity> listOfProducts = products.getContent();
+        List<ProductDto> contents = listOfProducts.stream().map(productEntity ->
                 mapToDto(productEntity)).collect(Collectors.toList());
-        ProductsResponseDto productsResponse = new ProductsResponseDto();
-        productsResponse.setContent(contents);
-        return productsResponse;
+        ProductsResponseDto responseProducts = new ProductsResponseDto();
+        responseProducts.setContent(contents);
+        responseProducts.setPageNo(products.getNumber() + 1);
+        responseProducts.setPageSize(products.getSize());
+        responseProducts.setTotalPages(products.getTotalPages());
+        responseProducts.setTotalElements(products.getTotalElements());
+        responseProducts.setLast(products.isLast());
+        return responseProducts;
     }
 
     @Override
-    public ProductDto getProductById(String id) {
+    public ProductDto getProductById(int id) {
         ProductEntity product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
         return mapToDto(product);
     }
 
     @Override
-    public ProductDto updateProductById(String id, ProductDto productDto) {
+    public ProductDto updateProductById(int id, ProductDto productDto) {
         ProductEntity oldProduct = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
         oldProduct.setName(productDto.getName());
         oldProduct.setCategory(productDto.getCategory());
@@ -58,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public String deleteProductById(String id) {
+    public String deleteProductById(int id) {
         ProductEntity product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
         productRepository.delete(product);
         return "deleted";

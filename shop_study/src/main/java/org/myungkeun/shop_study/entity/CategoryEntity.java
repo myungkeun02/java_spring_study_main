@@ -1,13 +1,12 @@
-package org.myungkeun.blog_study.entity;
+package org.myungkeun.shop_study.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -15,13 +14,19 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "category")
-public class Category {
+public class CategoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
-    private String description;
+    private int id;
 
-    @OneToMany(mappedBy = "category")
-    private List<Product> products = new ArrayList<>();
+    @Column
+    private String name;
+
+    @Column
+    private String desc;
+
+    @ManyToMany(mappedBy = "categories")
+    private Set<ProductEntity> products = new HashSet<>();
+
+
 }
