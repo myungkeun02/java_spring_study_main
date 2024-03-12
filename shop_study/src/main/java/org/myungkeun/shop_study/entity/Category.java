@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.HashSet;
-import java.util.Set;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Getter
 @Setter
@@ -14,19 +16,14 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "category")
-public class CategoryEntity {
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
-    @Column
+    @Column(name = "name")
     private String name;
-
-    @Column
-    private String desc;
-
-    @ManyToMany(mappedBy = "categories")
-    private Set<ProductEntity> products = new HashSet<>();
-
-
+    @Column(name = "description")
+    private String description;
+    @OneToMany(mappedBy = "category")
+    private List<Product> products = new ArrayList<>();
 }

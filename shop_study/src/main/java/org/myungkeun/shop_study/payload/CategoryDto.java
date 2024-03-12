@@ -1,10 +1,13 @@
 package org.myungkeun.shop_study.payload;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class CategoryDto {
     private int id;
     private String name;
-    private String desc;
+    private String description;
 }

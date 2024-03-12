@@ -1,10 +1,12 @@
 package org.myungkeun.shop_study.service.impl;
 
 import org.modelmapper.ModelMapper;
-import org.myungkeun.shop_study.entity.ProductEntity;
+import org.myungkeun.shop_study.entity.Category;
+import org.myungkeun.shop_study.entity.Product;
 import org.myungkeun.shop_study.exception.ResourceNotFoundException;
 import org.myungkeun.shop_study.payload.ProductDto;
 import org.myungkeun.shop_study.payload.ProductsResponseDto;
+import org.myungkeun.shop_study.repository.CategoryRepository;
 import org.myungkeun.shop_study.repository.ProductRepository;
 import org.myungkeun.shop_study.service.ProductService;
 import org.springframework.data.domain.Page;
@@ -21,15 +23,18 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepository;
     private ModelMapper modelMapper;
 
-    public ProductServiceImpl(ProductRepository productRepository, ModelMapper modelMapper) {
+    private CategoryRepository categoryRepository;
+
+    public ProductServiceImpl(ProductRepository productRepository, ModelMapper modelMapper, CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
         this.productRepository = productRepository;
     }
 
     @Override
     public ProductDto createProduct(ProductDto productDto) {
-        ProductEntity productEntity = mapToEntity(productDto);
-        ProductEntity newProduct = productRepository.save(productEntity);
+        Product product = mapToEntity(productDto);
+        Product newProduct = productRepository.save(product);
         ProductDto productResponse = mapToDto(newProduct);
         return productResponse;
     }
@@ -40,10 +45,10 @@ public class ProductServiceImpl implements ProductService {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        Page<ProductEntity> products = productRepository.findAll(pageable);
-        List<ProductEntity> listOfProducts = products.getContent();
-        List<ProductDto> contents = listOfProducts.stream().map(productEntity ->
-                mapToDto(productEntity)).collect(Collectors.toList());
+        Page<Product> products = productRepository.findAll(pageable);
+        List<Product> listOfProducts = products.getContent();
+        List<ProductDto> contents = listOfProducts.stream().map(product ->
+                mapToDto(product)).collect(Collectors.toList());
         ProductsResponseDto responseProducts = new ProductsResponseDto();
         responseProducts.setContent(contents);
         responseProducts.setPageNo(products.getNumber() + 1);
@@ -56,36 +61,39 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto getProductById(int id) {
-        ProductEntity product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
         return mapToDto(product);
     }
 
     @Override
     public ProductDto updateProductById(int id, ProductDto productDto) {
-        ProductEntity oldProduct = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
+        Product oldProduct = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
+        Category category = categoryRepository.findById(productDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", productDto.getCategoryId()));
         oldProduct.setName(productDto.getName());
-        oldProduct.setCategory(productDto.getCategory());
+        oldProduct.setCategory(category);
         oldProduct.setDetail(productDto.getDetail());
         oldProduct.setPrice(productDto.getPrice());
-        ProductEntity updateProduct = productRepository.save(oldProduct);
+        Product updateProduct = productRepository.save(oldProduct);
         return mapToDto(updateProduct);
     }
 
     @Override
     public String deleteProductById(int id) {
-        ProductEntity product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
         productRepository.delete(product);
         return "deleted";
     }
 
 
-    private ProductDto mapToDto(ProductEntity productEntity) {
-        ProductDto productDto = modelMapper.map(productEntity, ProductDto.class);
+    private ProductDto mapToDto(Product product) {
+        ProductDto productDto = modelMapper.map(product, ProductDto.class);
         return productDto;
     }
 
-    private ProductEntity mapToEntity(ProductDto productDto) {
-        ProductEntity productEntity = modelMapper.map(productDto, ProductEntity.class);
+    private Product mapToEntity(ProductDto productDto) {
+        Product productEntity = modelMapper.map(productDto, Product.class);
         return productEntity;
     }
 
