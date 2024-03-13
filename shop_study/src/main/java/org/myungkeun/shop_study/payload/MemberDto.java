@@ -7,10 +7,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ProductDto {
+public class MemberDto {
+    private String email;
     private String name;
-    private int categoryId;
-    private String detail;
-    private int quantity;
-    private int price;
+    private String password;
+    private String phone;
 }

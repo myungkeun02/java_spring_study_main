@@ -33,7 +33,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto createProduct(ProductDto productDto) {
+        Category category = categoryRepository.findById(productDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", productDto.getCategoryId()));
+
         Product product = mapToEntity(productDto);
+        product.setCategory(category);
         Product newProduct = productRepository.save(product);
         ProductDto productResponse = mapToDto(newProduct);
         return productResponse;
@@ -41,7 +45,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductsResponseDto getAllProducts(int pageNo, int pageSize, String sortBy, String sortDir) {
-        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.DESC.name()) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
