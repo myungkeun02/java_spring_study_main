@@ -12,10 +12,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class AddressServiceImPl implements AddressService {
     private ModelMapper modelMapper;
     private AddressRepository addressRepository;
@@ -42,34 +44,52 @@ public class AddressServiceImPl implements AddressService {
     public AddressesResponseDto getAllAddress(int pageNo, int pageSize, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-
-        Page<Member> members = memberRepository.findAll(pageable);
-        List<Member> listOfMembers = members.getContent();
-        List<MemberDto> contents = listOfMembers.stream().map(member ->
-                mapToDto(member)).collect(Collectors.toList());
-        MembersResponseDto responseMembers = new MembersResponseDto();
-        responseMembers.setContent(contents);
-        responseMembers.setPageNo(members.getNumber() + 1);
-        responseMembers.setPageSize(members.getSize());
-        responseMembers.setTotalPages(members.getTotalPages());
-        responseMembers.setTotalElements(members.getTotalElements());
-        responseMembers.setLast(members.isLast());
-        return responseMembers;
+        Page<Address> addresses = addressRepository.findAll(pageable);
+        List<Address> listOfAddresses = addresses.getContent();
+        List<AddressDto> contents = listOfAddresses.stream().map(address ->
+                mapToDto(address)).collect(Collectors.toList());
+        AddressesResponseDto addressesResponseDto = new AddressesResponseDto();
+        addressesResponseDto.setContent(contents);
+        addressesResponseDto.setPageNo(addresses.getNumber() + 1);
+        addressesResponseDto.setPageSize(addresses.getSize());
+        addressesResponseDto.setTotalPages(addresses.getTotalPages());
+        addressesResponseDto.setTotalElements(addresses.getTotalElements());
+        addressesResponseDto.setLast(addresses.isLast());
+        return addressesResponseDto;
     }
 
     @Override
     public AddressDto getAddressById(int id) {
-        return null;
+        Address address = addressRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Address", "id", id));
+        AddressDto responseAddress = mapToDto(address);
+        return responseAddress;
     }
 
     @Override
-    public AddressDto deleteAddressById(int id) {
-        return null;
+    public String deleteAddressById(int id) {
+        Address address = addressRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Address", "id", id));
+        addressRepository.delete(address);
+        return "deleted";
     }
 
     @Override
     public AddressDto updateAddressById(int id, AddressDto addressDto) {
-        return null;
+        Address oldAddress = addressRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Address", "id", id));
+        Member member = memberRepository.findById(addressDto.getMemberId())
+                .orElseThrow(() -> new ResourceNotFoundException("Member", "id", id));
+        oldAddress.setMember(member);
+        oldAddress.setAddr(addressDto.getAddr());
+        oldAddress.setName(addressDto.getName());
+        oldAddress.setPhone(addressDto.getPhone());
+        oldAddress.setAddrDetail(addressDto.getAddrDetail());
+        oldAddress.setRequest(addressDto.getRequest());
+        oldAddress.setZipcode(addressDto.getZipcode());
+        Address updateAddress = addressRepository.save(oldAddress);
+        AddressDto responseAddress = mapToDto(updateAddress);
+        return responseAddress;
     }
     private AddressDto mapToDto(Address address) {
         AddressDto addressDto = modelMapper.map(address, AddressDto.class);

@@ -10,7 +10,7 @@ public interface AddressService {
 
     AddressDto getAddressById(int id);
 
-    AddressDto deleteAddressById(int id);
+    String deleteAddressById(int id);
 
     AddressDto updateAddressById(int id, AddressDto addressDto);
 }
