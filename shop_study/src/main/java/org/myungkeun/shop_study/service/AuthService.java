@@ -1,5 +1,6 @@
 package org.myungkeun.shop_study.service;
 
+import org.myungkeun.shop_study.entity.Member;
 import org.myungkeun.shop_study.payload.LoginUserDto;
 import org.myungkeun.shop_study.payload.RegisterUserDto;
 
