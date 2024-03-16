@@ -1,5 +1,6 @@
 package org.myungkeun.shop_study.service.impl;
 
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.myungkeun.shop_study.entity.Category;
 import org.myungkeun.shop_study.exception.ResourceNotFoundException;
